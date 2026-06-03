@@ -91,12 +91,20 @@ async function runKlivoTransaction(data: KlivoInput, account: KlivoAccount) {
   const ip = getClientIp();
   const tracking = data.tracking ?? {};
 
-  const cart = (data.cart ?? [
+  const cartItems = data.cart ?? [
     { title: "Pedido", quantity: 1, price: data.amount },
-  ]).map((i) => ({
-    ...i,
-    product_hash: account.productHash,
-    operation_type: 1,
+  ];
+  // Per KlivoPay docs (https://docs.klivopay.com.br/transacoes/criar-transacao):
+  // cart items use { name, quantity, unit_price }
+  const cart = cartItems.map((i) => ({
+    name: i.title,
+    quantity: i.quantity,
+    unit_price: i.price,
+  }));
+  const cartForStorage = cartItems.map((i) => ({
+    title: i.title,
+    quantity: i.quantity,
+    price: i.price,
   }));
 
   try {
@@ -138,14 +146,29 @@ async function runKlivoTransaction(data: KlivoInput, account: KlivoAccount) {
       };
     }
 
-    const pix = (json.pix as Record<string, unknown> | undefined) ?? {};
-    const code = String(pix.pix_qr_code ?? "");
+    // Per docs success response: { success: true, data: { hash, pix_copy_paste, pix_qr_code, amount, expires_at } }
+    // Keep backward-compat with older flat shape too.
+    const payload =
+      ((json.data as Record<string, unknown> | undefined) ?? json) as Record<
+        string,
+        unknown
+      >;
+    const pixObj = (payload.pix as Record<string, unknown> | undefined) ?? {};
+    const code = String(
+      payload.pix_copy_paste ??
+        payload.pix_qr_code ??
+        pixObj.pix_copy_paste ??
+        pixObj.pix_qr_code ??
+        "",
+    );
     if (!code) {
+      console.error(`Klivopay missing pix code [${account.label}]`, json);
       return { ok: false as const, error: "Pix não retornado pela API." };
     }
 
-    const hash = String(json.hash ?? "");
-    const amountCents = Number(json.amount ?? data.amount);
+    const hash = String(payload.hash ?? json.hash ?? "");
+    const amountCents = Number(payload.amount ?? data.amount);
+    const expiresAt = (payload.expires_at as string | undefined) ?? null;
 
     try {
       const rawPayload = JSON.parse(
