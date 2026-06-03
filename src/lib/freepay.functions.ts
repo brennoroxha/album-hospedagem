@@ -3,6 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendUtmifyOrder, utmifyDate } from "@/lib/utmify.server";
+import { getWebhookUrl } from "@/lib/app-url.server";
 
 const trackingSchema = z
   .object({
