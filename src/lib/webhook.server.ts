@@ -29,8 +29,8 @@ export type NormalizedEvent = {
 /** Normalize many possible status strings into our canonical set. */
 export function normalizeStatus(s: unknown): NormalizedEvent["status"] {
   const v = String(s ?? "").toLowerCase();
-  if (["paid", "approved", "completed", "succeeded", "success"].includes(v)) return "paid";
-  if (["refused", "declined", "failed", "denied"].includes(v)) return "refused";
+  if (["paid", "approved", "completed", "succeeded", "success", "authorized"].includes(v)) return "paid";
+  if (["refused", "declined", "failed", "denied", "canceled", "cancelled"].includes(v)) return "refused";
   if (["refunded", "refund"].includes(v)) return "refunded";
   if (["chargedback", "chargeback"].includes(v)) return "chargedback";
   if (
