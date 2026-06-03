@@ -4,6 +4,7 @@ import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendUtmifyOrder, utmifyDate } from "@/lib/utmify.server";
 import { getWebhookUrl } from "@/lib/app-url.server";
+import { getServerEnv } from "@/lib/env.server";
 
 const trackingSchema = z
   .object({
@@ -66,8 +67,8 @@ function getClientIp(): string | null {
 export const createFreepayTransaction = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => inputSchema.parse(input))
   .handler(async ({ data }) => {
-    const pub = process.env.FREEPAY_PUBLIC_KEY;
-    const sec = process.env.FREEPAY_SECRET_KEY;
+    const pub = getServerEnv("FREEPAY_PUBLIC_KEY");
+    const sec = getServerEnv("FREEPAY_SECRET_KEY");
     if (!pub || !sec) {
       return { ok: false as const, error: "Freepay não configurado." };
     }
