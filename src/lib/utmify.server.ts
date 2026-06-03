@@ -1,6 +1,8 @@
 // Server-only helper: forwards order events to Utmify.
 // Called from the gateway webhooks once we know the final status.
 
+import { getServerEnv } from "@/lib/env.server";
+
 type UtmifyStatus = "waiting_payment" | "paid" | "refused" | "refunded" | "chargedback";
 
 export type UtmifyCustomer = {
@@ -54,8 +56,6 @@ export function utmifyDate(d: Date = new Date()): string {
     d.getUTCDate(),
   )} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
 }
-
-import { getServerEnv } from "@/lib/env.server";
 
 export async function sendUtmifyOrder(args: SendUtmifyArgs): Promise<
   | { ok: true; response: unknown }
