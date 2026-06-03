@@ -180,7 +180,7 @@ async function runKlivoTransaction(data: KlivoInput, account: KlivoAccount) {
           tracking,
           metadata: { client_ip: ip },
           customer: { ...data.customer, ip },
-          cart,
+          cart: cartForStorage,
           initial_response: json,
         }),
       );
