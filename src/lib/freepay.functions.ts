@@ -94,8 +94,7 @@ export const createFreepayTransaction = createServerFn({ method: "POST" })
           body: JSON.stringify({
             amount: data.amount,
             payment_method: "pix",
-            postback_url:
-              "https://happy-place-builder-95.lovable.app/api/public/freepay-webhook",
+            postback_url: getWebhookUrl("/api/public/freepay-webhook"),
             customer: {
               name: data.customer.name,
               email: data.customer.email,
