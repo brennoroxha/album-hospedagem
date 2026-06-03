@@ -244,7 +244,7 @@ async function runKlivoTransaction(data: KlivoInput, account: KlivoAccount) {
       hash,
       pix_copy_paste: code,
       amount: amountCents,
-      expires_at: null,
+      expires_at: expiresAt,
     };
   } catch (err) {
     console.error("Klivopay request failed", err);
