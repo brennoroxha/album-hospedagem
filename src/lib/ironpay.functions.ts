@@ -3,6 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendUtmifyOrder, utmifyDate } from "@/lib/utmify.server";
+import { getServerEnv } from "@/lib/env.server";
 
 import { getWebhookUrl } from "@/lib/app-url.server";
 
@@ -65,7 +66,7 @@ function getClientIp(): string | null {
 }
 
 async function runIronTransaction(data: IronInput) {
-  const token = process.env.IRONPAY_API_TOKEN;
+  const token = getServerEnv("IRONPAY_API_TOKEN");
   if (!token) {
     return { ok: false as const, error: "Pagamento IronPay não configurado." };
   }

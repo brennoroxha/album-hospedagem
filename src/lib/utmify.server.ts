@@ -1,6 +1,8 @@
 // Server-only helper: forwards order events to Utmify.
 // Called from the gateway webhooks once we know the final status.
 
+import { getServerEnv } from "@/lib/env.server";
+
 type UtmifyStatus = "waiting_payment" | "paid" | "refused" | "refunded" | "chargedback";
 
 export type UtmifyCustomer = {
@@ -60,7 +62,7 @@ export async function sendUtmifyOrder(args: SendUtmifyArgs): Promise<
   | { ok: false; error: string }
 > {
   const tokenEnv = args.tokenEnv ?? "UTMIFY_API_TOKEN";
-  const token = process.env[tokenEnv];
+  const token = getServerEnv(tokenEnv, tokenEnv === "UTMIFY_API_TOKEN_PANINI" ? ["UTMIFY_API_TOKEN"] : []);
   if (!token) {
     console.warn(`[utmify] ${tokenEnv} not set, skipping`);
     return { ok: false, error: "missing_token" };

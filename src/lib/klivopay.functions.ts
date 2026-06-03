@@ -3,6 +3,7 @@ import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendUtmifyOrder, utmifyDate } from "@/lib/utmify.server";
+import { getServerEnv } from "@/lib/env.server";
 
 type KlivoAccount = {
   label: string;
@@ -83,7 +84,10 @@ function getClientIp(): string | null {
 }
 
 async function runKlivoTransaction(data: KlivoInput, account: KlivoAccount) {
-  const token = process.env[account.tokenEnv];
+  const token = getServerEnv(
+    account.tokenEnv,
+    account.tokenEnv === "KLIVOPAY_API_TOKEN_2" ? ["KLIVOPAY_API_TOKEN"] : [],
+  );
   if (!token) {
     return { ok: false as const, error: "Pagamento não configurado." };
   }

@@ -6,10 +6,12 @@
 //
 // Falls back to the original Lovable preview URL so existing deployments
 // keep working until the env var is set.
+import { getServerEnv } from "@/lib/env.server";
+
 const FALLBACK_APP_URL = "https://happy-place-builder-95.lovable.app";
 
 export function getPublicAppUrl(): string {
-  const raw = process.env.PUBLIC_APP_URL?.trim();
+  const raw = getServerEnv("PUBLIC_APP_URL")?.trim();
   const base = raw && raw.length > 0 ? raw : FALLBACK_APP_URL;
   return base.replace(/\/+$/, "");
 }
