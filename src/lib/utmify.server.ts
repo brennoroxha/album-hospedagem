@@ -55,12 +55,14 @@ export function utmifyDate(d: Date = new Date()): string {
   )} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
 }
 
+import { getServerEnv } from "@/lib/env.server";
+
 export async function sendUtmifyOrder(args: SendUtmifyArgs): Promise<
   | { ok: true; response: unknown }
   | { ok: false; error: string }
 > {
   const tokenEnv = args.tokenEnv ?? "UTMIFY_API_TOKEN";
-  const token = process.env[tokenEnv];
+  const token = getServerEnv(tokenEnv, tokenEnv === "UTMIFY_API_TOKEN_PANINI" ? ["UTMIFY_API_TOKEN"] : []);
   if (!token) {
     console.warn(`[utmify] ${tokenEnv} not set, skipping`);
     return { ok: false, error: "missing_token" };
